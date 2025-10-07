@@ -103,23 +103,23 @@ function DFRL:RunMods()
     for i = 1, table.getn(list) do
         local name = list[i].name
         local func = list[i].func
-		local enabled = self.tempDB[name] and self.tempDB[name].enabled
-		if enabled == true then
+        local enabled = self.tempDB[name] and self.tempDB[name].enabled
+        if enabled == true then
             collectgarbage()
-			local start = GetTime()
-			local mem = gcinfo()
-			setfenv(func, self:GetEnv())
-			local success, err = pcall(func)
-			if success then
-				self.performance[name] = {
-					time = GetTime() - start,
-					memory = gcinfo() - mem
-				}
-			else
-				geterrorhandler()(err)
-			end
-		end
-	end
+            local start = GetTime()
+            local mem = gcinfo()
+            setfenv(func, self:GetEnv())
+            local success, err = pcall(func)
+            if success then
+                self.performance[name] = {
+                    time = GetTime() - start,
+                    memory = gcinfo() - mem
+                }
+            else
+                geterrorhandler()(err)
+            end
+        end
+    end
 end
 
 -- database
@@ -310,6 +310,15 @@ DFRL:SetScript("OnEvent", function()
         DFRL:RunMods()
         print("Welcome to |cffffd200Dragonflight:|r Reloaded.")
         print("Open menu via |cffddddddESC|r or |cffddddddSLASH DFRL|r.")
+
+        -- Disable OnEnter scripts and hide TargetFrameDebuffXX frames
+        for i = 1, 40 do
+            local debuffFrame = _G["TargetFrameDebuff" .. i]
+            if debuffFrame then
+                debuffFrame:SetScript("OnEnter", nil)
+                debuffFrame:Hide() -- Hide the debuff frame
+            end
+        end
     end
     if event == "PLAYER_LOGOUT" then
         DFRL:SaveTempDB()
